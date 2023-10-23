@@ -5,6 +5,7 @@ import android.view.MenuItem
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -84,7 +86,55 @@ fun Portada(navController: NavHostController, snackbarHostState: SnackbarHostSta
 
         Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             bottomBar = {
-                MyBottomAppBar(showDrawer, badgeCount)
+                BottomAppBar(
+                    containerColor = Color.Red,
+                    contentColor = Color.White,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .zIndex(1f)
+                )
+                {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(end = 5.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(
+                                onClick = {
+                                    showDrawer = !showDrawer
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowBack,
+                                    contentDescription = null,
+                                    tint = Color.White
+                                )
+                            }
+                            BadgedBox(badge = {
+                                Text(text = badgeCount.toString(), modifier = Modifier
+                                    .background(Color.Blue, shape = CircleShape)) }) {
+                                Icon(
+                                    imageVector = Icons.Default.Favorite,
+                                    contentDescription = null,
+                                    modifier = Modifier.clickable { badgeCount++ },
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                        Row {
+                            FloatingActionButton(onClick = { /*TODO*/ }, containerColor = Pink40) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = null,
+                                    tint = Color.Black
+                                )
+                            }
+                        }
+                    }
+                }
             }
         )
         {
@@ -101,117 +151,52 @@ fun Portada(navController: NavHostController, snackbarHostState: SnackbarHostSta
                         }
                     }
                 )
-                showSnackBar(showSnackbar)
-            }
-            cardOptions(showDrawer)
-        }
-}
-
-@Composable
-private fun showSnackBar(showSnackbar: Boolean) {
-    var showSnackbar1 = showSnackbar
-    if (showSnackbar1) {
-        LaunchedEffect(true) {
-            delay(2000)
-            showSnackbar1 = false
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp), contentAlignment = Alignment.BottomCenter
-        ) {
-            Snackbar(
-                containerColor = Color.Black,
-                contentColor = Color.White
-            ) {
-                Text(text = "selectedCardName")
-            }
-        }
-    }
-}
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun cardOptions(showDrawer: Boolean) {
-    if (showDrawer) {
-        ModalDrawerSheet {
-            Image(
-                painter = painterResource(id = R.drawable.manchasolar),
-                contentDescription = "Image",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(220.dp),
-                contentScale = ContentScale.Crop
-            )
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                Text(text = "Build")
-            }
-            Row {
-                Icon(imageVector = Icons.Default.Info, contentDescription = null)
-                Text(text = "Info")
-            }
-            Row {
-                Icon(imageVector = Icons.Default.Email, contentDescription = null)
-                Text(text = "Email")
-            }
-        }
-    }
-}
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun MyBottomAppBar(showDrawer: Boolean, badgeCount: Int) {
-    var showDrawer1 = showDrawer
-    var badgeCount1 = badgeCount
-    BottomAppBar(
-        containerColor = Color.Red,
-        contentColor = Color.White,
-        modifier = Modifier
-            .fillMaxWidth()
-            .zIndex(1f)
-    )
-    {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 5.dp)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(
-                    onClick = {
-                        showDrawer1 = !showDrawer1
+                if (showSnackbar) {
+                    LaunchedEffect(true) {
+                        delay(2000)
+                        showSnackbar = false
                     }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = null,
-                        tint = Color.White
-                    )
-                }
-                BadgedBox(badge = { Text(text = badgeCount1.toString()) }) {
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        contentDescription = null,
-                        modifier = Modifier.clickable { badgeCount1++ },
-                        tint = Color.White
-                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp), contentAlignment = Alignment.BottomCenter
+                    ) {
+                        Snackbar(
+                            containerColor = Color.Black,
+                            contentColor = Color.White
+                        ) {
+                            Text(text = "selectedCardName")
+                        }
+                    }
                 }
             }
-            Row {
-                FloatingActionButton(onClick = { /*TODO*/ }, containerColor = Pink40) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null,
-                        tint = Color.Black
+            if (showDrawer) {
+                ModalDrawerSheet {
+                    Image(
+                        painter = painterResource(id = R.drawable.manchasolar),
+                        contentDescription = "Image",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(220.dp),
+                        contentScale = ContentScale.Crop
                     )
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Icon(imageVector = Icons.Default.Build, contentDescription = null)
+                        Text(text = "Build")
+                    }
+                    Row {
+                        Icon(imageVector = Icons.Default.Info, contentDescription = null)
+                        Text(text = "Info")
+                    }
+                    Row {
+                        Icon(imageVector = Icons.Default.Email, contentDescription = null)
+                        Text(text = "Email")
+                    }
                 }
             }
         }
-    }
 }
+
 
 data class CardData(
     var name: String,
@@ -253,7 +238,6 @@ fun getCardData(): List<CardData> {
 fun ItemCard(cardData: CardData, snackbarHostState: SnackbarHostState) {
     var isImageMenuVisible by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -270,76 +254,67 @@ fun ItemCard(cardData: CardData, snackbarHostState: SnackbarHostState) {
                     .height(220.dp),
                 contentScale = ContentScale.Crop
             )
-            CardBottomAppBar(cardData, isImageMenuVisible)
-        }
-    }
-}
-
-@Composable
-private fun CardBottomAppBar(
-    cardData: CardData,
-    isImageMenuVisible: Boolean
-) {
-    var isImageMenuVisible1 = isImageMenuVisible
-    BottomAppBar(modifier = Modifier.height(55.dp)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = cardData.name, modifier = Modifier.padding(start = 10.dp))
-            IconButton(
-                onClick = {
-                    isImageMenuVisible1 = true
+            BottomAppBar(modifier = Modifier.height(55.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = cardData.name, modifier = Modifier.padding(start = 10.dp))
+                    IconButton(
+                        onClick = {
+                            isImageMenuVisible = true
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "Abrir menú"
+                        )
+                    }
                 }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = "Abrir menú"
-                )
-            }
-        }
 
-        DropdownMenu(
-            expanded = isImageMenuVisible1,
-            onDismissRequest = { isImageMenuVisible1 = false },
-            offset = DpOffset(0.dp, ((-40).dp))
-        )
-        {
-            DropdownMenuItem(
-                text = {
-                    Text(
-                        text = "Copiar",
-                        color = Color.Black,
-                        fontSize = 16.sp
+                DropdownMenu(
+                    expanded = isImageMenuVisible,
+                    onDismissRequest = { isImageMenuVisible = false },
+                    offset = DpOffset(0.dp, ((-40).dp))
+                )
+                {
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = "Copiar",
+                                color = Color.Black,
+                                fontSize = 16.sp
+                            )
+                        },
+                        onClick = { isImageMenuVisible = false },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null,
+                                tint = Color.Black
+                            )
+                        },
                     )
-                },
-                onClick = { isImageMenuVisible1 = false },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null,
-                        tint = Color.Black
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = "Eliminar",
+                                color = Color.Black,
+                                fontSize = 16.sp
+                            )
+                        },
+                        onClick = { isImageMenuVisible = false },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = null,
+                                tint = Color.Black
+                            )
+                        },
                     )
-                },
-            )
-            DropdownMenuItem(
-                text = {
-                    Text(
-                        text = "Eliminar",
-                        color = Color.Black,
-                        fontSize = 16.sp
-                    )
-                },
-                onClick = { isImageMenuVisible1 = false },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                        tint = Color.Black
-                    )
-                },
-            )
+                }
+            }
         }
     }
 }

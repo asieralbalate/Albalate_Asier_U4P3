@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
@@ -107,7 +108,7 @@ fun Portada(navController: NavHostController, snackbarHostState: SnackbarHostSta
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         IconButton(
                             onClick = {
-                                scope.launch{drawerState.open()}
+                                scope.launch { drawerState.open() }
                             }
                         ) {
                             Icon(
@@ -117,15 +118,16 @@ fun Portada(navController: NavHostController, snackbarHostState: SnackbarHostSta
                             )
                         }
                         BadgedBox(badge = {
-                            Text(
-                                text = badgeCount.toString(), modifier = Modifier
-                                    .background(Color.Blue, shape = CircleShape)
-                            )
-                        }) {
+                            Badge {
+                                Text(text = badgeCount.toString())
+                            }
+
+                        }, modifier = Modifier
+                            .padding(10.dp)
+                            .clickable { badgeCount++ }) {
                             Icon(
                                 imageVector = Icons.Default.Favorite,
                                 contentDescription = null,
-                                modifier = Modifier.clickable { badgeCount++ },
                                 tint = Color.White
                             )
                         }
@@ -144,29 +146,32 @@ fun Portada(navController: NavHostController, snackbarHostState: SnackbarHostSta
         }
     )
     {
+        val items = listOf(Icons.Default.Build, Icons.Default.Info, Icons.Default.Email)
+        val selectedItem = remember {
+            mutableStateOf(items[0])
+        }
         ModalNavigationDrawer(drawerState = drawerState,
             drawerContent = {
                 ModalDrawerSheet {
                     Image(
-                        painter = painterResource(id = R.drawable.manchasolar),
+                        painter = painterResource(id = R.drawable.corona_solar),
                         contentDescription = "Image",
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(220.dp),
                         contentScale = ContentScale.Crop
                     )
-
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        Icon(imageVector = Icons.Default.Build, contentDescription = null)
-                        Text(text = "Build")
-                    }
-                    Row {
-                        Icon(imageVector = Icons.Default.Info, contentDescription = null)
-                        Text(text = "Info")
-                    }
-                    Row {
-                        Icon(imageVector = Icons.Default.Email, contentDescription = null)
-                        Text(text = "Email")
+                    Spacer(modifier = Modifier.height(12.dp))
+                    items.forEach { item ->
+                        NavigationDrawerItem(
+                            icon = { Icon(item, contentDescription = null) },
+                            label = { Text(text = item.name.substringAfter(".")) },
+                            selected = item == selectedItem.value,
+                            onClick = {
+                                scope.launch { drawerState.close() }
+                                selectedItem.value = item
+                                navController.navigate(item.name)
+                            })
                     }
                 }
             }, content = {

@@ -35,6 +35,7 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -75,102 +76,76 @@ import com.example.albalate_asier_u4p3.ui.theme.Pink40
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Portada(navController: NavHostController, snackbarHostState: SnackbarHostState) {
     var badgeCount by remember { mutableStateOf(0) }
-    var showSnackbar by remember { mutableStateOf(false) }
-    var showDrawer by remember { mutableStateOf(false) }
+    var drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val snackbarHostState = remember { SnackbarHostState() }
-
-        Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-            bottomBar = {
-                BottomAppBar(
-                    containerColor = Color.Red,
-                    contentColor = Color.White,
+    val scope = rememberCoroutineScope()
+    Scaffold(snackbarHost = {
+        SnackbarHost(hostState = snackbarHostState)
+    },
+        bottomBar = {
+            BottomAppBar(
+                containerColor = Color.Red,
+                contentColor = Color.White,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .zIndex(1f)
+            )
+            {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .zIndex(1f)
-                )
-                {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(end = 5.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            IconButton(
-                                onClick = {
-                                    showDrawer = !showDrawer
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.ArrowBack,
-                                    contentDescription = null,
-                                    tint = Color.White
-                                )
+                        .padding(end = 5.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(
+                            onClick = {
+                                scope.launch{drawerState.open()}
                             }
-                            BadgedBox(badge = {
-                                Text(text = badgeCount.toString(), modifier = Modifier
-                                    .background(Color.Blue, shape = CircleShape)) }) {
-                                Icon(
-                                    imageVector = Icons.Default.Favorite,
-                                    contentDescription = null,
-                                    modifier = Modifier.clickable { badgeCount++ },
-                                    tint = Color.White
-                                )
-                            }
-                        }
-                        Row {
-                            FloatingActionButton(onClick = { /*TODO*/ }, containerColor = Pink40) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = null,
-                                    tint = Color.Black
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        )
-        {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = it.calculateBottomPadding())
-            ) {
-                val cardDataList = getCardData()
-                LazyVerticalGrid(columns = GridCells.Fixed(2),
-                    content = {
-                        items(cardDataList) { cardData ->
-                            ItemCard(cardData , snackbarHostState)
-                        }
-                    }
-                )
-                if (showSnackbar) {
-                    LaunchedEffect(true) {
-                        delay(2000)
-                        showSnackbar = false
-                    }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp), contentAlignment = Alignment.BottomCenter
-                    ) {
-                        Snackbar(
-                            containerColor = Color.Black,
-                            contentColor = Color.White
                         ) {
-                            Text(text = "selectedCardName")
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = null,
+                                tint = Color.White
+                            )
+                        }
+                        BadgedBox(badge = {
+                            Text(
+                                text = badgeCount.toString(), modifier = Modifier
+                                    .background(Color.Blue, shape = CircleShape)
+                            )
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Favorite,
+                                contentDescription = null,
+                                modifier = Modifier.clickable { badgeCount++ },
+                                tint = Color.White
+                            )
+                        }
+                    }
+                    Row {
+                        FloatingActionButton(onClick = { /*TODO*/ }, containerColor = Pink40) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null,
+                                tint = Color.Black
+                            )
                         }
                     }
                 }
             }
-            if (showDrawer) {
+        }
+    )
+    {
+        ModalNavigationDrawer(drawerState = drawerState,
+            drawerContent = {
                 ModalDrawerSheet {
                     Image(
                         painter = painterResource(id = R.drawable.manchasolar),
@@ -180,6 +155,7 @@ fun Portada(navController: NavHostController, snackbarHostState: SnackbarHostSta
                             .height(220.dp),
                         contentScale = ContentScale.Crop
                     )
+
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Icon(imageVector = Icons.Default.Build, contentDescription = null)
                         Text(text = "Build")
@@ -193,8 +169,23 @@ fun Portada(navController: NavHostController, snackbarHostState: SnackbarHostSta
                         Text(text = "Email")
                     }
                 }
-            }
-        }
+            }, content = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = it.calculateBottomPadding())
+                ) {
+                    val cardDataList = getCardData()
+                    LazyVerticalGrid(columns = GridCells.Fixed(2),
+                        content = {
+                            items(cardDataList) { cardData ->
+                                ItemCard(cardData, snackbarHostState)
+                            }
+                        }
+                    )
+                }
+            })
+    }
 }
 
 
@@ -243,7 +234,7 @@ fun ItemCard(cardData: CardData, snackbarHostState: SnackbarHostState) {
             .fillMaxWidth()
             .padding(10.dp),
         elevation = CardDefaults.cardElevation(10.dp),
-        onClick = { scope.launch { snackbarHostState.showSnackbar(cardData.name) }}
+        onClick = { scope.launch { snackbarHostState.showSnackbar(cardData.name) } }
     ) {
         Column(Modifier.fillMaxSize()) {
             Image(

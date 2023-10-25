@@ -30,9 +30,9 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = "Portada") {
                         composable("Portada") { Portada(navController, snackbarHostState = SnackbarHostState()) }
-                        composable("Filled.Email") { Email() }
-                        composable("Filled.Info") { Info() }
-                        composable("Filled.Build") { Build() }
+                        composable("Filled.Email") { Email(navController, snackbarHostState =  SnackbarHostState()) }
+                        composable("Filled.Info") { Info(navController, snackbarHostState =  SnackbarHostState()) }
+                        composable("Filled.Build") { Portada(navController, snackbarHostState =  SnackbarHostState()) }
 
                     }
                 }
